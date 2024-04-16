@@ -39,7 +39,7 @@ def broadening(frequencies, intensities, sigma, num_points=1000):
 
 def plot_spectrum(frequencies, intensities, title, color):
     """ Plots a spectrum given frequencies and intensities with Gaussian broadening. """
-    sigma = 12  # Standard deviation for the Gaussian broadening
+    sigma = 10  # Standard deviation for the Gaussian broadening
     x_vals, y_vals = broadening(frequencies, intensities, sigma)
 
     plt.figure(figsize=(10, 4))
@@ -52,7 +52,7 @@ def plot_spectrum(frequencies, intensities, title, color):
     st.pyplot(plt)
 
 # Streamlit UI components
-st.title('Gaussian .log File IR Spectrum Analyzer')
+st.title("IR Spectrum visualizer from Gaussian .log files")
 uploaded_file = st.file_uploader("Upload your Gaussian .log file", type="log")
 color = st.color_picker("Choose a color for the IR Spectrum plot", "#FF0000")
 
