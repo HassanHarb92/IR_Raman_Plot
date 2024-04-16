@@ -44,10 +44,13 @@ def plot_spectrum(frequencies, intensities, title, color):
 
     plt.figure(figsize=(10, 4))
     plt.plot(x_vals, y_vals, color=color)
+
     plt.title(f"{title} Spectrum")
     plt.xlabel("Frequency (cm^-1)")
     plt.ylabel("Intensity")
     plt.grid(True)
+    plt.xlim(0, 5000)  # Set x-axis limits from 0 to 5000
+
     plt.gca().invert_yaxis()  # Optional: Invert y-axis if needed
     st.pyplot(plt)
 
