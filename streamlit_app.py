@@ -36,6 +36,7 @@ def plot_spectrum(frequencies, intensities, title, color):
     plt.grid(True)
     st.pyplot(plt)
 
+
 # Streamlit UI components
 st.title('Gaussian .log File IR Spectrum Analyzer')
 uploaded_file = st.file_uploader("Upload your Gaussian .log file", type="log")
@@ -45,8 +46,8 @@ color = st.color_picker("Choose a color for the IR Spectrum plot", "#FF0000")
 if uploaded_file is not None:
     contents = uploaded_file.getvalue().decode("utf-8")
     frequencies, ir_intensities = parse_gaussian_log(contents)
-    print("frequencies", frequencies)
-    print("IR intensities",ir_intensities)
+#    print("frequencies", frequencies)
+#    print("IR intensities",ir_intensities)
     if frequencies and ir_intensities:
         plot_spectrum(frequencies, ir_intensities, "IR", color)
     else:
