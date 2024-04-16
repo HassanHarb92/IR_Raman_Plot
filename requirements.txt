@@ -11,4 +11,3 @@ ipython_genutils
 stmol
 joblib
 scikit-learn==1.2.2
-re
