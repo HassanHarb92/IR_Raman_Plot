@@ -1,0 +1,14 @@
+numpy
+pandas
+pyarrow
+matplotlib
+plotly
+pillow
+streamlit
+rdkit-pypi
+py3Dmol==2.0.0.post2
+ipython_genutils
+stmol
+joblib
+scikit-learn==1.2.2
+re
