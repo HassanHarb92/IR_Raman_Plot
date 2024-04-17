@@ -2,6 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 import re
+from io import BytesIO
 
 def parse_gaussian_log(contents):
     """
@@ -19,16 +20,14 @@ def parse_gaussian_log(contents):
         elif "IR Inten" in line:
             words = line.split()
             for i in range(3,len(words)):
-                ir_intensities.append(float(words[i]))    
-
+                ir_intensities.append(float(words[i]))
 
     return frequencies, ir_intensities
+
 def gaussian(x, mu, sigma):
-    """ Returns the Gaussian function for broadening. """
     return np.exp(-0.5 * ((x - mu) / sigma) ** 2)
 
 def broadening(frequencies, intensities, sigma, num_points=1000):
-    """ Applies Gaussian broadening to the spectrum. """
     x_vals = np.linspace(min(frequencies) - 10 * sigma, max(frequencies) + 10 * sigma, num_points)
     y_vals = np.zeros(num_points)
 
@@ -38,23 +37,24 @@ def broadening(frequencies, intensities, sigma, num_points=1000):
     return x_vals, y_vals
 
 def plot_spectrum(frequencies, intensities, title, color):
-    """ Plots a spectrum given frequencies and intensities with Gaussian broadening. """
-    sigma = 10  # Standard deviation for the Gaussian broadening
+    sigma = 10  # Standard deviation for Gaussian broadening
     x_vals, y_vals = broadening(frequencies, intensities, sigma)
 
     plt.figure(figsize=(10, 4))
     plt.plot(x_vals, y_vals, color=color)
-
     plt.title(f"{title} Spectrum")
     plt.xlabel("Frequency (cm^-1)")
     plt.ylabel("Intensity")
     plt.grid(True)
-    plt.xlim(5000, 0)  # Set x-axis limits from 0 to 5000
+    plt.xlim(5000, 0)
 
     plt.gca().invert_yaxis()  # Optional: Invert y-axis if needed
-    st.pyplot(plt)
 
-# Streamlit UI components
+    buf = BytesIO()
+    plt.savefig(buf, format="png")
+    buf.seek(0)
+    return buf
+
 st.title("IR Spectrum visualizer from Gaussian .log files")
 uploaded_file = st.file_uploader("Upload your Gaussian .log file", type="log")
 color = st.color_picker("Choose a color for the IR Spectrum plot", "#FF0000")
@@ -64,6 +64,9 @@ if uploaded_file is not None:
     frequencies, ir_intensities = parse_gaussian_log(contents)
 
     if frequencies and ir_intensities:
-        plot_spectrum(frequencies, ir_intensities, "IR", color)
+        buf = plot_spectrum(frequencies, ir_intensities, "IR", color)
+        st.pyplot(plt)
+        st.download_button("Save plot", buf, "plot.png", "Download plot")
     else:
         st.error("No IR frequency or intensity data found in the file.")
+
