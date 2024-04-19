@@ -4,13 +4,13 @@ import numpy as np
 import re
 from io import BytesIO
 
+
 def parse_gaussian_log(contents):
-    """
-    Parses Gaussian log file contents to extract frequencies and IR intensities.
-    """
     freq_pattern = r"Frequencies -- ([\d\.\- ]+)"
     ir_intensity_pattern = r"IR Inten"
-    frequencies, ir_intensities = [], []
+    raman_intensity_pattern = r"Raman Activ"
+    frequencies, ir_intensities, Raman_intensities = [], [], []
+    Raman_present = False
 
     for line in contents.splitlines():
         if "Frequencies --" in line:
@@ -19,10 +19,16 @@ def parse_gaussian_log(contents):
                 frequencies.extend([float(f) for f in freq_matches.group(1).split()])
         elif "IR Inten" in line:
             words = line.split()
-            for i in range(3,len(words)):
+            for i in range(3, len(words)):
                 ir_intensities.append(float(words[i]))
+        elif "Raman Activ" in line:
+            Raman_present = True
+            words = line.split()
+            for i in range(3, len(words)):
+                Raman_intensities.append(float(words[i]))
 
-    return frequencies, ir_intensities
+    return frequencies, ir_intensities, Raman_intensities, Raman_present
+
 
 def gaussian(x, mu, sigma):
     return np.exp(-0.5 * ((x - mu) / sigma) ** 2)
@@ -61,13 +67,22 @@ color = st.color_picker("Choose a color for the IR Spectrum plot", "#FF0000")
 
 if uploaded_file is not None:
     contents = uploaded_file.getvalue().decode("utf-8")
-    frequencies, ir_intensities = parse_gaussian_log(contents)
+    frequencies, ir_intensities, Raman_intensities, Raman_present = parse_gaussian_log(contents)
 
     if frequencies and ir_intensities:
         buf = plot_spectrum(frequencies, ir_intensities, "IR", color)
         st.pyplot(plt)
-        st.download_button("Save plot", buf, "plot.png", "Download plot")
+        st.download_button("Save IR plot", buf, "ir_plot.png", "Download plot")
     else:
         st.error("No IR frequency or intensity data found in the file.")
 
-# next step: add RAMAN as well
+    if Raman_present and Raman_intensities:
+        buf_raman = plot_spectrum(frequencies, Raman_intensities, "Raman", 'teal')
+        st.pyplot(plt)
+        st.download_button("Save Raman plot", buf_raman, "raman_plot.png", "Download Raman plot")
+    elif Raman_present:
+        st.error("Raman intensities found, but no data to plot.")
+    else:
+        st.error("Raman data not found. Make sure to add freq=raman to your Gaussian input")
+
+
