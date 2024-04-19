@@ -70,3 +70,4 @@ if uploaded_file is not None:
     else:
         st.error("No IR frequency or intensity data found in the file.")
 
+# next step: add RAMAN as well
