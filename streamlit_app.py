@@ -61,7 +61,7 @@ def plot_spectrum(frequencies, intensities, title, color):
     buf.seek(0)
     return buf
 
-st.title("IR Spectrum visualizer from Gaussian .log files")
+st.title("IR and Raman Spectrum visualizer from Gaussian .log files")
 uploaded_file = st.file_uploader("Upload your Gaussian .log file", type="log")
 color = st.color_picker("Choose a color for the IR Spectrum plot", "#FF0000")
 
