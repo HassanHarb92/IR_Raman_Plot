@@ -86,3 +86,4 @@ if uploaded_file is not None:
         st.error("Raman data not found. Make sure to add freq=raman to your Gaussian input")
 
 
+# update color schemes maybe? or visualization options transmission vs absorbance
