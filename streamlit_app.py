@@ -4,6 +4,7 @@ import numpy as np
 import re
 from io import BytesIO
 import pandas as pd
+import os
 
 
 def parse_gaussian_log(contents):
@@ -78,6 +79,9 @@ uploaded_file = st.file_uploader("Upload your Gaussian .log file", type="log")
 color = st.color_picker("Choose a color for the IR Spectrum plot", "#FF0000")
 
 if uploaded_file is not None:
+    # Extract file name without extension
+    file_name = os.path.splitext(uploaded_file.name)[0]
+
     contents = uploaded_file.getvalue().decode("utf-8")
     frequencies, ir_intensities, Raman_intensities, Raman_present = parse_gaussian_log(contents)
 
@@ -85,11 +89,11 @@ if uploaded_file is not None:
         # Plot and download the IR spectrum
         buf = plot_spectrum(frequencies, ir_intensities, "IR", color)
         st.pyplot(plt)
-        st.download_button("Save IR plot", buf, "ir_plot.png", "Download plot")
+        st.download_button(f"Save IR plot ({file_name})", buf, f"{file_name}_ir_plot.png", "Download plot")
 
         # Create CSV for IR data
         ir_csv = create_csv(zip(frequencies, ir_intensities), ["Frequency (cm^-1)", "IR Intensity"])
-        st.download_button("Download IR Data", ir_csv, "ir_data.csv", "text/csv", key='ir')
+        st.download_button(f"Download IR Data ({file_name})", ir_csv, f"{file_name}_ir_data.csv", "text/csv", key='ir')
 
     else:
         st.error("No IR frequency or intensity data found in the file.")
@@ -98,14 +102,16 @@ if uploaded_file is not None:
         # Plot and download the Raman spectrum
         buf_raman = plot_spectrum(frequencies, Raman_intensities, "Raman", 'teal')
         st.pyplot(plt)
-        st.download_button("Save Raman plot", buf_raman, "raman_plot.png", "Download Raman plot")
+        st.download_button(f"Save Raman plot ({file_name})", buf_raman, f"{file_name}_raman_plot.png", "Download Raman plot")
 
         # Create CSV for Raman data
         raman_csv = create_csv(zip(frequencies, Raman_intensities), ["Frequency (cm^-1)", "Raman Intensity"])
-        st.download_button("Download Raman Data", raman_csv, "raman_data.csv", "text/csv", key='raman')
+        st.download_button(f"Download Raman Data ({file_name})", raman_csv, f"{file_name}_raman_data.csv", "text/csv", key='raman')
 
     elif Raman_present:
         st.error("Raman intensities found, but no data to plot.")
     else:
         st.error("Raman data not found. Make sure to add freq=raman to your Gaussian input")
+
+
 
